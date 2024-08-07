@@ -1,4 +1,4 @@
-package pkg
+package database
 
 import (
 	"backend/backend/pkg/helpers"
@@ -11,12 +11,11 @@ import (
 )
 
 var (
-	clientInstance      *mongo.Client
-	clientInstanceError error
-	mongoOnce           sync.Once
+	clientInstance *mongo.Client
+	mongoOnce      sync.Once
 )
 
-func InitMongo() (*mongo.Client, error) {
+func InitMongo() *mongo.Client {
 	mongoOnce.Do(func() {
 		connectionURL := os.Getenv("DB_URI")
 		if connectionURL == "" {
@@ -29,16 +28,53 @@ func InitMongo() (*mongo.Client, error) {
 		defer cancel()
 
 		// connect with mongo
-		clientInstance, clientInstanceError := mongo.Connect(ctx, clientOptions)
-		if clientInstanceError != nil {
-			log.Fatal(clientInstanceError.Error())
+		clientInstance, err := mongo.Connect(ctx, clientOptions)
+		if err != nil {
+			log.Fatal(err.Error())
 		}
 
-		err := clientInstance.Ping(ctx, nil)
+		err = clientInstance.Ping(ctx, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
 	})
 
-	return clientInstance, nil
+	return clientInstance
+}
+
+func GetDBName() string {
+	dbname := os.Getenv("DB_NAME")
+	if dbname == "" {
+		log.Fatal("DB_NAME environment variable not set")
+	}
+
+	return dbname
+}
+
+func GetCollection(collEnv string) *mongo.Collection {
+	if collEnv == "" {
+		log.Fatalln("collEnv can't be empty")
+	}
+
+	collName := os.Getenv(collEnv)
+
+	if collName == "" {
+		log.Fatalf("%s environment variable is not set", collEnv)
+	}
+
+	client := InitMongo()
+	dbName := GetDBName()
+
+	return client.Database(dbName).Collection(collName)
+}
+
+func GetUsersCollection() *mongo.Collection {
+	return GetCollection("DB_USER_COLLECTION")
+}
+
+func CloseMongo() {
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	clientInstance.Disconnect(ctx)
 }
