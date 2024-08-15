@@ -2,7 +2,7 @@ package main
 
 import (
 	"backend/backend/api/router"
-	database "backend/backend/pkg/db"
+	"backend/backend/pkg/database"
 	"backend/backend/pkg/helpers"
 	"fmt"
 	"log"
