@@ -4,6 +4,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+var (
+	UserKeyUserID       = "userId"
+	UserKeyToken        = "token"
+	UserKeyRefreshToken = "refreshToken"
+	UserKeyUpdatedOn    = "updatedOn"
+)
+
 type User struct {
 	ID           primitive.ObjectID `json:"_id"`
 	Name         string             `json:"name" validator:"required"`
@@ -13,5 +20,5 @@ type User struct {
 	UpdatedOn    int64              `json:"updatedOn"`
 	Token        string             `json:"token"`
 	RefreshToken string             `json:"refreshToken"`
-	UserID       string             `json:"userId`
+	UserID       string             `json:"userId"`
 }

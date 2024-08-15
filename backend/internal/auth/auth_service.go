@@ -1,7 +1,47 @@
 package auth
 
-import "backend/backend/models"
+import (
+	"backend/backend/internal/user"
+	"backend/backend/models"
+	"backend/backend/pkg/database"
+	"backend/backend/pkg/helpers"
+	"fmt"
+
+	"go.mongodb.org/mongo-driver/bson"
+)
 
 func Login(login *models.Login) (*models.User, error) {
-	// TODO: work on it next
+	userCollection := database.GetUsersCollection()
+
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	filter := bson.M{"email": login.Email}
+
+	var foundUser *models.User
+
+	err := userCollection.FindOne(ctx, filter).Decode(&foundUser)
+	if err != nil {
+		fmt.Printf("user not found %s", err.Error())
+		return nil, fmt.Errorf("user not found")
+	}
+
+	validPass := helpers.VerifyPassword(&login.Password, &foundUser.Password)
+	if !validPass {
+		return nil, fmt.Errorf("invalid email/password")
+	}
+
+	token, refreshToken, err := helpers.GenerateTokens(foundUser.Name, foundUser.Email, foundUser.UserID)
+
+	if err != nil {
+		return nil, fmt.Errorf(err.Error())
+	}
+
+	err = user.UpdateTokens(token, refreshToken, foundUser.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return foundUser, nil
+
 }
