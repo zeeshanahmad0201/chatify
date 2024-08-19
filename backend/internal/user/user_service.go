@@ -1,11 +1,11 @@
 package user
 
 import (
-	"backend/backend/models"
-	"backend/backend/pkg/database"
-	"backend/backend/pkg/helpers"
 	"fmt"
 
+	"github.com/zeeshanahmad0201/chatify/backend/models"
+	"github.com/zeeshanahmad0201/chatify/backend/pkg/database"
+	"github.com/zeeshanahmad0201/chatify/backend/pkg/helpers"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"

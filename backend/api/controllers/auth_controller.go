@@ -1,12 +1,12 @@
-package controller
+package controllers
 
 import (
-	"backend/backend/internal/auth"
-	"backend/backend/models"
 	"encoding/json"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/zeeshanahmad0201/chatify/backend/internal/auth"
+	"github.com/zeeshanahmad0201/chatify/backend/models"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {

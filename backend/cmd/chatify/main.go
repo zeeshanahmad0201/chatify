@@ -1,9 +1,6 @@
 package main
 
 import (
-	"backend/backend/api/router"
-	"backend/backend/pkg/database"
-	"backend/backend/pkg/helpers"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +8,11 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/joho/godotenv"
+	"github.com/zeeshanahmad0201/chatify/backend/api/router"
+	"github.com/zeeshanahmad0201/chatify/backend/pkg/database"
+	"github.com/zeeshanahmad0201/chatify/backend/pkg/helpers"
 )
 
 var (
@@ -20,6 +22,12 @@ var (
 
 func main() {
 	fmt.Println("Welcome to Chatify!")
+
+	// init dotenv
+	err := godotenv.Load()
+	if err != nil {
+		panic(".env file not found")
+	}
 
 	// init mongodb
 	database.InitMongo()

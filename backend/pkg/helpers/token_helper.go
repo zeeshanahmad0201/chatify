@@ -1,13 +1,13 @@
 package helpers
 
 import (
-	"backend/backend/models"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/zeeshanahmad0201/chatify/backend/models"
 )
 
 func ValidateToken(clientToken string) (claims *models.SignedDetails, err error) {

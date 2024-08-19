@@ -1,11 +1,11 @@
 package database
 
 import (
-	"backend/backend/pkg/helpers"
 	"log"
 	"os"
 	"sync"
 
+	"github.com/zeeshanahmad0201/chatify/backend/pkg/helpers"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -39,6 +39,7 @@ func InitMongo() *mongo.Client {
 		}
 	})
 
+	log.Println("mongo initialized...")
 	return clientInstance
 }
 
@@ -61,11 +62,10 @@ func GetCollection(collEnv string) *mongo.Collection {
 	if collName == "" {
 		log.Fatalf("%s environment variable is not set", collEnv)
 	}
-
-	client := InitMongo()
 	dbName := GetDBName()
+	log.Printf("dbName %s", dbName)
 
-	return client.Database(dbName).Collection(collName)
+	return clientInstance.Database(dbName).Collection(collName)
 }
 
 func GetUsersCollection() *mongo.Collection {
