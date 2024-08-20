@@ -16,3 +16,15 @@ func VerifyPassword(providedPass *string, currentPass *string) bool {
 	return err != nil
 
 }
+
+// HashPassword hashes the password and return
+func HashPassword(password string) (string, error) {
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(hashedPass), nil
+
+}

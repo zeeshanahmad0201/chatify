@@ -28,18 +28,18 @@ func InitMongo() *mongo.Client {
 		defer cancel()
 
 		// connect with mongo
-		clientInstance, err := mongo.Connect(ctx, clientOptions)
+		instance, err := mongo.Connect(ctx, clientOptions)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
 
-		err = clientInstance.Ping(ctx, nil)
+		err = instance.Ping(ctx, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
+		clientInstance = instance
 	})
 
-	log.Println("mongo initialized...")
 	return clientInstance
 }
 
@@ -63,9 +63,10 @@ func GetCollection(collEnv string) *mongo.Collection {
 		log.Fatalf("%s environment variable is not set", collEnv)
 	}
 	dbName := GetDBName()
-	log.Printf("dbName %s", dbName)
 
-	return clientInstance.Database(dbName).Collection(collName)
+	db := clientInstance.Database(dbName)
+
+	return db.Collection(collName)
 }
 
 func GetUsersCollection() *mongo.Collection {

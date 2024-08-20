@@ -9,6 +9,7 @@ func InitRouter() *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/login", controllers.Login)
+	r.HandleFunc("/signup", controllers.Signup)
 
 	return r
 }
