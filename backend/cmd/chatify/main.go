@@ -21,6 +21,7 @@ var (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	fmt.Println("Welcome to Chatify!")
 
 	// init dotenv

@@ -73,6 +73,10 @@ func GetUsersCollection() *mongo.Collection {
 	return GetCollection("DB_USER_COLLECTION")
 }
 
+func GetMsgsCollection() *mongo.Collection {
+	return GetCollection("DB_MESSAGE_COLLECTION")
+}
+
 func CloseMongo() {
 	ctx, cancel := helpers.CreateContext()
 	defer cancel()

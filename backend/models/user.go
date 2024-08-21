@@ -6,6 +6,7 @@ import (
 
 var (
 	UserKeyUserID       = "userId"
+	UserKeyID           = "_id"
 	UserKeyToken        = "token"
 	UserKeyRefreshToken = "refreshToken"
 	UserKeyUpdatedOn    = "updatedOn"
@@ -19,13 +20,13 @@ var UserValidationErrs = map[string]string{
 }
 
 type User struct {
-	ID           primitive.ObjectID `json:"_id" bson:"_id"`
+	ID           primitive.ObjectID `bson:"_id,omitempty"`
 	Name         string             `json:"name" validate:"required"`
 	Email        string             `json:"email" validate:"required"`
 	Password     string             `json:"password" validate:"required,min=6"`
-	AddedOn      int64              `json:"addedOn" bson:"added_on"`
-	UpdatedOn    int64              `json:"updatedOn" bson:"updated_on"`
+	AddedOn      int64              `json:"addedOn" bson:"addedOn"`
+	UpdatedOn    int64              `json:"updatedOn" bson:"updatedOn"`
 	Token        string             `json:"token" bson:"token"`
-	RefreshToken string             `json:"refreshToken" bson:"refresh_token"`
-	UserID       string             `json:"userId" bson:"user_id"`
+	RefreshToken string             `json:"refreshToken" bson:"refreshToken"`
+	UserID       string             `json:"userId" bson:"userId"`
 }

@@ -26,12 +26,18 @@ func Login(login *models.Login) (*models.User, error) {
 		return nil, fmt.Errorf("user not found")
 	}
 
+	hashedPassword, err := helpers.HashPassword(login.Password)
+	if err != nil {
+		return nil, fmt.Errorf("invalid email/password")
+	}
+	login.Password = hashedPassword
+
 	var foundUser *models.User
 
 	err = userCollection.FindOne(ctx, filter).Decode(&foundUser)
 	if err != nil {
-		fmt.Printf("user not found %s", err.Error())
-		return nil, fmt.Errorf("user not found")
+		fmt.Printf("FindOne: %s", err.Error())
+		return nil, fmt.Errorf("invalid email/password")
 	}
 
 	validPass := helpers.VerifyPassword(&login.Password, &foundUser.Password)
@@ -42,7 +48,7 @@ func Login(login *models.Login) (*models.User, error) {
 	token, refreshToken, err := helpers.GenerateTokens(foundUser.Name, foundUser.Email, foundUser.UserID)
 
 	if err != nil {
-		return nil, fmt.Errorf(err.Error())
+		return nil, err
 	}
 
 	err = user.UpdateTokens(token, refreshToken, foundUser.UserID)
@@ -51,7 +57,6 @@ func Login(login *models.Login) (*models.User, error) {
 	}
 
 	return foundUser, nil
-
 }
 
 func Signup(user *models.User) (string, error) {

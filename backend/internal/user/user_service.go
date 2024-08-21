@@ -38,7 +38,7 @@ func UpdateTokens(token string, refreshToken string, userId string) error {
 		Upsert: &upsert,
 	}
 
-	_, err := userCollection.UpdateByID(ctx, filter, bson.D{
+	_, err := userCollection.UpdateOne(ctx, filter, bson.D{
 		{
 			Key:   "$set",
 			Value: updateObj,

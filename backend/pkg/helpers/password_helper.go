@@ -13,7 +13,7 @@ func VerifyPassword(providedPass *string, currentPass *string) bool {
 		fmt.Printf("invalid password %s", err)
 	}
 
-	return err != nil
+	return err == nil
 
 }
 
