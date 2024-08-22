@@ -22,7 +22,6 @@ var FieldErrorMessages = map[string]map[string]string{
 }
 
 func GetValidationErrMsg(err error) string {
-
 	if validationErrs, ok := err.(validator.ValidationErrors); ok {
 		firstErr := validationErrs[0]
 		field := firstErr.Field()
