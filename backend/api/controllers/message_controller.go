@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
+	"log"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/zeeshanahmad0201/chatify/backend/internal/message"
 	"github.com/zeeshanahmad0201/chatify/backend/models"
+	"github.com/zeeshanahmad0201/chatify/backend/pkg/helpers"
 )
 
 func StoreMessage(w http.ResponseWriter, r *http.Request) {
@@ -21,21 +22,10 @@ func StoreMessage(w http.ResponseWriter, r *http.Request) {
 
 	// validate struct
 	validate := validator.New()
-	err = validate.Struct(&messageObj)
+	err = validate.Struct(messageObj)
 	if err != nil {
-		var errs validator.ValidationErrors
-		if !errors.As(err, &errs) {
-			http.Error(w, "invalid payload", http.StatusBadRequest)
-			return
-		}
-
-		firstErr := errs[0]
-		field := firstErr.Field()
-		message, exists := models.MessageValidationErrs[field]
-		if !exists {
-			message = firstErr.Error()
-		}
-		http.Error(w, message, http.StatusBadRequest)
+		log.Printf("error while validating messageObj: %s", err)
+		http.Error(w, helpers.GetValidationErrMsg(err), http.StatusBadRequest)
 		return
 	}
 

@@ -19,8 +19,8 @@ type Message struct {
 	SenderID   string             `json:"senderId" bson:"senderId" validate:"required"`
 	ReceiverID string             `json:"receiverId" bson:"receiverId" validate:"required"`
 	Message    string             `json:"message" bson:"message" validate:"required"`
-	Timestamp  int64              `json:"timestamp" bson:"timestamp" validate:"required"`
-	Status     MessageStatus      `json:"status" bson:"status" validate:"required"`
+	Timestamp  int64              `json:"timestamp" bson:"timestamp"`
+	Status     MessageStatus      `json:"status" bson:"status"`
 }
 
 type MessageStatus string

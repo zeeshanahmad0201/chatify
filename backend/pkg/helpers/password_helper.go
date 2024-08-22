@@ -7,7 +7,7 @@ import (
 )
 
 func VerifyPassword(providedPass *string, currentPass *string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(*providedPass), []byte(*currentPass))
+	err := bcrypt.CompareHashAndPassword([]byte(*currentPass), []byte(*providedPass))
 
 	if err != nil {
 		fmt.Printf("invalid password %s", err)

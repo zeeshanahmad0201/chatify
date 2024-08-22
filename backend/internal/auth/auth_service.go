@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/zeeshanahmad0201/chatify/backend/internal/user"
 	"github.com/zeeshanahmad0201/chatify/backend/models"
@@ -23,14 +24,11 @@ func Login(login *models.Login) (*models.User, error) {
 	count, err := userCollection.CountDocuments(ctx, filter)
 
 	if err != nil || count == 0 {
+		if err != nil {
+			log.Printf("CountDocuments err:%s", err)
+		}
 		return nil, fmt.Errorf("user not found")
 	}
-
-	hashedPassword, err := helpers.HashPassword(login.Password)
-	if err != nil {
-		return nil, fmt.Errorf("invalid email/password")
-	}
-	login.Password = hashedPassword
 
 	var foundUser *models.User
 
@@ -86,6 +84,7 @@ func Signup(user *models.User) (string, error) {
 
 	user.ID = primitive.NewObjectID()
 	user.UserID = user.ID.Hex()
+	user.AddedOn = helpers.GetCurrentTimeInMillis()
 
 	token, refreshToken, err := helpers.GenerateTokens(user.Name, user.Email, user.UserID)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/zeeshanahmad0201/chatify/backend/internal/auth"
 	"github.com/zeeshanahmad0201/chatify/backend/models"
+	"github.com/zeeshanahmad0201/chatify/backend/pkg/helpers"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -22,15 +23,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	validate := validator.New()
 
 	if err := validate.Struct(loginReq); err != nil {
-		for _, value := range err.(validator.ValidationErrors) {
-			field := value.Field()
-
-			message, exists := models.LoginValidationErrs[field]
-			if !exists {
-				message = value.Error()
-			}
-			http.Error(w, message, http.StatusBadRequest)
-		}
+		log.Printf("error while validating loginReq: %s", err.Error())
+		http.Error(w, helpers.GetValidationErrMsg(err), http.StatusBadRequest)
 		return
 	}
 
@@ -58,19 +52,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	if err := validate.Struct(user); err != nil {
 		log.Println("error:", err.Error())
-		errs := err.(validator.ValidationErrors)
-		if len(errs) == 0 {
-			http.Error(w, "invalid payload", http.StatusBadRequest)
-			return
-		}
-
-		firstErr := errs[0]
-		field := firstErr.Field()
-		message, exists := models.UserValidationErrs[field]
-		if !exists {
-			message = firstErr.Error()
-		}
-		http.Error(w, message, http.StatusBadRequest)
+		http.Error(w, helpers.GetValidationErrMsg(err), http.StatusBadRequest)
 		return
 	}
 
