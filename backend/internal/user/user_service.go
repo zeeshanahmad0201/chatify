@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/zeeshanahmad0201/chatify/backend/models"
 	"github.com/zeeshanahmad0201/chatify/backend/pkg/database"
@@ -47,6 +48,46 @@ func UpdateTokens(token string, refreshToken string, userId string) error {
 
 	if err != nil {
 		return fmt.Errorf("unable to update the tokens for the user")
+	}
+
+	return nil
+}
+
+func FetchUserByEmail(email string) *models.User {
+	filter := bson.M{models.UserKeyEmail: email}
+	return FetchUserByFilter(filter)
+}
+
+func FetchUserByToken(token string) *models.User {
+	filter := bson.M{models.UserKeyToken: token}
+	return FetchUserByFilter(filter)
+}
+
+func FetchUserByFilter(filter primitive.M) *models.User {
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	usersCollection := database.GetUsersCollection()
+
+	var foundUser *models.User
+	err := usersCollection.FindOne(ctx, filter).Decode(&foundUser)
+	if err != nil {
+		log.Printf("error fetching user: %v", err)
+	}
+
+	return foundUser
+}
+
+func AddUser(userModel *models.User) error {
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	usersCollection := database.GetUsersCollection()
+
+	_, err := usersCollection.InsertOne(ctx, userModel)
+	if err != nil {
+		fmt.Printf("InsertOne: %s", err.Error())
+		return err
 	}
 
 	return nil

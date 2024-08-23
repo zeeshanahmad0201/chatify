@@ -11,6 +11,7 @@ func InitRouter() *mux.Router {
 	r.HandleFunc("/login", controllers.Login).Methods("POST")
 	r.HandleFunc("/signup", controllers.Signup).Methods("POST")
 	r.HandleFunc("/message/send", controllers.StoreMessage).Methods("POST")
+	r.HandleFunc("/messages", controllers.GetMessages).Methods("GET")
 
 	return r
 }

@@ -6,6 +6,7 @@ var (
 	MessageFieldSenderID   = "senderId"
 	MessageFieldReceiverID = "receiverId"
 	MessageFieldMessage    = "message"
+	MessageFieldTimestamp  = "timestamp"
 )
 
 var MessageValidationErrs = map[string]string{
@@ -16,7 +17,7 @@ var MessageValidationErrs = map[string]string{
 
 type Message struct {
 	ID         primitive.ObjectID `bson:"_id"`
-	SenderID   string             `json:"senderId" bson:"senderId" validate:"required"`
+	SenderID   string             `json:"senderId" bson:"senderId"`
 	ReceiverID string             `json:"receiverId" bson:"receiverId" validate:"required"`
 	Message    string             `json:"message" bson:"message" validate:"required"`
 	Timestamp  int64              `json:"timestamp" bson:"timestamp"`

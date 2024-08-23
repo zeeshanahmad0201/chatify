@@ -8,6 +8,8 @@ import (
 	"github.com/zeeshanahmad0201/chatify/backend/pkg/database"
 	"github.com/zeeshanahmad0201/chatify/backend/pkg/helpers"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // StoreMessage stores a message in the database.
@@ -32,7 +34,7 @@ func StoreMessage(message *models.Message) error {
 	}
 
 	// Validate receiver ID
-	filter = bson.M{models.UserKeyID: message.ReceiverID}
+	filter = bson.M{models.UserKeyUserID: message.ReceiverID}
 	count, err = userCollection.CountDocuments(ctx, filter)
 	if err != nil {
 		return fmt.Errorf("error validating receiver ID: %v", err)
@@ -41,7 +43,7 @@ func StoreMessage(message *models.Message) error {
 		return fmt.Errorf("invalid receiver ID")
 	}
 
-	// Set message timestamp and status
+	message.ID = primitive.NewObjectID()
 	message.Timestamp = helpers.GetCurrentTimeInMillis()
 	message.Status = models.Sent
 
@@ -53,4 +55,42 @@ func StoreMessage(message *models.Message) error {
 	}
 
 	return nil
+}
+
+func FetchMessages(senderId string, receiverId string) []models.Message {
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	filter := bson.M{
+		models.MessageFieldReceiverID: receiverId,
+		models.MessageFieldSenderID:   senderId,
+	}
+
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{Key: models.MessageFieldTimestamp, Value: 1}})
+
+	messagesCollection := database.GetMsgsCollection()
+	messages := make([]models.Message, 0)
+
+	cursor, err := messagesCollection.Find(ctx, filter, findOptions)
+	if err != nil {
+		log.Printf("error finding messages: %v", err)
+		return messages
+	}
+
+	for cursor.Next(ctx) {
+		var message models.Message
+		if err := cursor.Decode(&message); err != nil {
+			log.Printf("error decoding messages: %v", err)
+			continue
+		}
+		messages = append(messages, message)
+	}
+
+	if err := cursor.Err(); err != nil {
+		log.Printf("cursor error: %v", err)
+		return messages
+	}
+
+	return messages
 }

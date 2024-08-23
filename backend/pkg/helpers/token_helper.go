@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -62,4 +63,13 @@ func GenerateTokens(name string, email string, userId string) (token string, ref
 	}
 
 	return token, refreshToken, nil
+}
+
+func ExtractToken(authHeader string) string {
+	parts := strings.SplitN(authHeader, " ", 2)
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return ""
+	}
+
+	return parts[1]
 }
