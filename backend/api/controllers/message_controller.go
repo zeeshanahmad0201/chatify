@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/websocket"
 	"github.com/zeeshanahmad0201/chatify/backend/internal/message"
 	"github.com/zeeshanahmad0201/chatify/backend/internal/user"
 	"github.com/zeeshanahmad0201/chatify/backend/models"
@@ -72,12 +73,12 @@ func GetMessages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get token from headers
-	authHeaders := r.Header.Get("Authorization")
-	if authHeaders == "" {
-		http.Error(w, "Authorization header is required", http.StatusUnauthorized)
+	token := helpers.ExtractTokenFromRequest(r)
+	if token == "" {
+		log.Printf("no token found %v", r.Header)
+		http.Error(w, "Invalid token!", http.StatusUnauthorized)
 		return
 	}
-	token := helpers.ExtractToken(authHeaders)
 
 	// fetch user based on the token
 	sender := user.FetchUserByToken(token)
@@ -96,4 +97,51 @@ func GetMessages(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(messages)
+}
+
+func MessageWebsocket(w http.ResponseWriter, r *http.Request) {
+
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			origin := r.Header.Get("Origin")
+			// Allow connections only from localhost
+			return origin == "http://localhost" || origin == "http://127.0.0.1"
+		},
+	}
+
+	con, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Printf("Failed to upgrade websocket: %v", con)
+		http.Error(w, "Failed to upgrade websocket", http.StatusInternalServerError)
+		return
+	}
+	defer con.Close()
+
+	for {
+		_, message, err := con.ReadMessage()
+		if err != nil {
+			log.Printf("Websocket read error: %v", err)
+			return
+		}
+
+		// TODO: complete the websocket
+		log.Printf("Message received: %v", message)
+
+		err = con.WriteMessage(websocket.TextMessage, message)
+		if err != nil {
+			log.Printf("Websocket write error: %v", err)
+			break
+		}
+	}
+}
+
+func DeleteMessage(w http.ResponseWriter, r *http.Request) {
+	token := helpers.ExtractTokenFromRequest(r)
+	if token == "" {
+		http.Error(w, "Invalid token!", http.StatusUnauthorized)
+		return
+	}
+
 }

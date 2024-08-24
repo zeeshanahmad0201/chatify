@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -72,4 +73,14 @@ func ExtractToken(authHeader string) string {
 	}
 
 	return parts[1]
+}
+
+func ExtractTokenFromRequest(r *http.Request) string {
+	authHeaders := r.Header.Get("Authorization")
+	if authHeaders == "" {
+		log.Println("no auth headers found")
+		return ""
+	}
+
+	return ExtractToken(authHeaders)
 }
