@@ -3,6 +3,7 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 var (
+	MessageFieldID         = "_id"
 	MessageFieldSenderID   = "senderId"
 	MessageFieldReceiverID = "receiverId"
 	MessageFieldMessage    = "message"
@@ -16,7 +17,7 @@ var MessageValidationErrs = map[string]string{
 }
 
 type Message struct {
-	ID         primitive.ObjectID `bson:"_id"`
+	ID         primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	SenderID   string             `json:"senderId" bson:"senderId"`
 	ReceiverID string             `json:"receiverId" bson:"receiverId" validate:"required"`
 	Message    string             `json:"message" bson:"message" validate:"required"`

@@ -94,3 +94,20 @@ func FetchMessages(senderId string, receiverId string) []models.Message {
 
 	return messages
 }
+
+func DeleteMessage(messageId string) error {
+	msgCollection := database.GetMsgsCollection()
+
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	filter := bson.M{models.MessageFieldID: messageId}
+
+	_, err := msgCollection.DeleteOne(ctx, filter)
+	if err != nil {
+		log.Printf("error while deleting the message: %v", err)
+		return fmt.Errorf("invalid message id")
+	}
+
+	return nil
+}

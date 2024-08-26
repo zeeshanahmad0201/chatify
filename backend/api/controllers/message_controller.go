@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -10,7 +11,9 @@ import (
 	"github.com/zeeshanahmad0201/chatify/backend/internal/message"
 	"github.com/zeeshanahmad0201/chatify/backend/internal/user"
 	"github.com/zeeshanahmad0201/chatify/backend/models"
+	"github.com/zeeshanahmad0201/chatify/backend/pkg/database"
 	"github.com/zeeshanahmad0201/chatify/backend/pkg/helpers"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func StoreMessage(w http.ResponseWriter, r *http.Request) {
@@ -137,11 +140,43 @@ func MessageWebsocket(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetOneMessage(userId string, messageId string) (*models.Message, error) {
+	if userId == "" || messageId == "" {
+		return nil, fmt.Errorf("invalid payload")
+	}
+
+	msgCollection := database.GetMsgsCollection()
+
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	filter := bson.M{
+		models.MessageFieldID:       messageId,
+		models.MessageFieldSenderID: userId,
+	}
+
+	message, err := msgCollection.FindOne(ctx, filter)
+	if err != nil {
+		log.Printf("error while finding the message: %v", err)
+		return fmt.Errorf("unable to find the message")
+	}
+
+	return message, nil
+}
+
 func DeleteMessage(w http.ResponseWriter, r *http.Request) {
 	token := helpers.ExtractTokenFromRequest(r)
 	if token == "" {
 		http.Error(w, "Invalid token!", http.StatusUnauthorized)
 		return
 	}
+
+	userInfo := user.FetchUserByToken(token)
+	if userInfo == nil {
+		http.Error(w, "Invalid token!", http.StatusUnauthorized)
+		return
+	}
+
+	//TODO: work on it
 
 }
