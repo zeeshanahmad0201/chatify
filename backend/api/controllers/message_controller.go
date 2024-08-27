@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -11,9 +10,7 @@ import (
 	"github.com/zeeshanahmad0201/chatify/backend/internal/message"
 	"github.com/zeeshanahmad0201/chatify/backend/internal/user"
 	"github.com/zeeshanahmad0201/chatify/backend/models"
-	"github.com/zeeshanahmad0201/chatify/backend/pkg/database"
 	"github.com/zeeshanahmad0201/chatify/backend/pkg/helpers"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func StoreMessage(w http.ResponseWriter, r *http.Request) {
@@ -140,43 +137,43 @@ func MessageWebsocket(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOneMessage(userId string, messageId string) (*models.Message, error) {
-	if userId == "" || messageId == "" {
-		return nil, fmt.Errorf("invalid payload")
-	}
-
-	msgCollection := database.GetMsgsCollection()
-
-	ctx, cancel := helpers.CreateContext()
-	defer cancel()
-
-	filter := bson.M{
-		models.MessageFieldID:       messageId,
-		models.MessageFieldSenderID: userId,
-	}
-
-	message, err := msgCollection.FindOne(ctx, filter)
-	if err != nil {
-		log.Printf("error while finding the message: %v", err)
-		return fmt.Errorf("unable to find the message")
-	}
-
-	return message, nil
-}
-
 func DeleteMessage(w http.ResponseWriter, r *http.Request) {
+	// extract token
 	token := helpers.ExtractTokenFromRequest(r)
 	if token == "" {
 		http.Error(w, "Invalid token!", http.StatusUnauthorized)
 		return
 	}
 
+	// validate token
 	userInfo := user.FetchUserByToken(token)
 	if userInfo == nil {
 		http.Error(w, "Invalid token!", http.StatusUnauthorized)
 		return
 	}
 
-	//TODO: work on it
+	// extract message id
+	messageId := w.Header().Get("messageId")
+	if messageId == "" {
+		http.Error(w, "invalid message id", http.StatusBadRequest)
+		return
+	}
 
+	// validate message id with sender id
+	_, err := message.FetchMessageByUserID(messageId, userInfo.UserID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// delete message
+	err = message.DeleteMessage(messageId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("message deleted successfully")
 }

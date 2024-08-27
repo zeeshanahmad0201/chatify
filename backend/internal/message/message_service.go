@@ -111,3 +111,24 @@ func DeleteMessage(messageId string) error {
 
 	return nil
 }
+
+func FetchMessageByUserID(messageId string, senderId string) (*models.Message, error) {
+	msgsCollection := database.GetMsgsCollection()
+
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	filter := bson.M{
+		models.MessageFieldID:       messageId,
+		models.MessageFieldSenderID: senderId,
+	}
+
+	var msg *models.Message
+	err := msgsCollection.FindOne(ctx, filter).Decode(&msg)
+	if err != nil {
+		log.Printf("error while fetching the doc: %v", err)
+		return nil, fmt.Errorf("unable to find the message")
+	}
+
+	return msg, nil
+}

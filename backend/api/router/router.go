@@ -12,6 +12,9 @@ func InitRouter() *mux.Router {
 	r.HandleFunc("/signup", controllers.Signup).Methods("POST")
 	r.HandleFunc("/message/send", controllers.StoreMessage).Methods("POST")
 	r.HandleFunc("/messages", controllers.GetMessages).Methods("GET")
+	r.HandleFunc("/message/delete", controllers.DeleteMessage).Methods("DELETE")
+
+	// web socket
 	r.HandleFunc("/messages/listen", controllers.MessageWebsocket)
 
 	return r
