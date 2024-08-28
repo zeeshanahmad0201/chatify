@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/zeeshanahmad0201/chatify/backend/internal/message"
 	"github.com/zeeshanahmad0201/chatify/backend/internal/user"
@@ -153,9 +155,9 @@ func DeleteMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// extract message id
-	messageId := w.Header().Get("messageId")
+	messageId := mux.Vars(r)["messageId"]
 	if messageId == "" {
-		http.Error(w, "invalid message id", http.StatusBadRequest)
+		http.Error(w, "invalid payload", http.StatusBadRequest)
 		return
 	}
 
@@ -176,4 +178,56 @@ func DeleteMessage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("message deleted successfully")
+}
+
+func MarkAsRead(w http.ResponseWriter, r *http.Request) {
+	updateStatus(w, r, models.Read)
+}
+
+func MarkAsDelivered(w http.ResponseWriter, r *http.Request) {
+	updateStatus(w, r, models.Delivered)
+}
+
+func updateStatus(w http.ResponseWriter, r *http.Request, newStatus models.MessageStatus) {
+	// extract token
+	token := helpers.ExtractTokenFromRequest(r)
+	if token == "" {
+		http.Error(w, "Invalid token!", http.StatusUnauthorized)
+		return
+	}
+
+	// validate token
+	userInfo := user.FetchUserByToken(token)
+	if userInfo == nil {
+		http.Error(w, "Invalid token!", http.StatusUnauthorized)
+		return
+	}
+
+	// extract the message id
+	msgId := mux.Vars(r)["messageId"]
+	if msgId == "" {
+		http.Error(w, "message id is missing from the route", http.StatusBadRequest)
+		return
+	}
+
+	msg, err := message.FetchMessageByUserID(msgId, userInfo.UserID)
+	if err != nil {
+		http.Error(w, "Message not found", http.StatusBadRequest)
+		return
+	}
+
+	if msg.Status == newStatus {
+		http.Error(w, fmt.Sprintf("message already %v", newStatus), http.StatusBadRequest)
+		return
+	}
+
+	err = message.UpdateMessageStatus(msgId, newStatus)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("message status updated")
 }

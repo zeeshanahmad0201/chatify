@@ -101,9 +101,15 @@ func DeleteMessage(messageId string) error {
 	ctx, cancel := helpers.CreateContext()
 	defer cancel()
 
-	filter := bson.M{models.MessageFieldID: messageId}
+	msgStr, err := primitive.ObjectIDFromHex(messageId)
+	if err != nil {
+		log.Printf("Invalid message id: %v", err)
+		return fmt.Errorf("invalid message ID")
+	}
 
-	_, err := msgCollection.DeleteOne(ctx, filter)
+	filter := bson.M{models.MessageFieldID: msgStr}
+
+	_, err = msgCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Printf("error while deleting the message: %v", err)
 		return fmt.Errorf("invalid message id")
@@ -118,17 +124,53 @@ func FetchMessageByUserID(messageId string, senderId string) (*models.Message, e
 	ctx, cancel := helpers.CreateContext()
 	defer cancel()
 
+	msgStr, err := primitive.ObjectIDFromHex(messageId)
+	if err != nil {
+		log.Printf("Invalid message id: %v", err)
+		return nil, fmt.Errorf("invalid message ID")
+	}
+
+	log.Printf("messageID: %v", msgStr)
+	log.Printf("senderID: %v", senderId)
+
 	filter := bson.M{
-		models.MessageFieldID:       messageId,
+		models.MessageFieldID:       msgStr,
 		models.MessageFieldSenderID: senderId,
 	}
 
 	var msg *models.Message
-	err := msgsCollection.FindOne(ctx, filter).Decode(&msg)
+	err = msgsCollection.FindOne(ctx, filter).Decode(&msg)
 	if err != nil {
 		log.Printf("error while fetching the doc: %v", err)
 		return nil, fmt.Errorf("unable to find the message")
 	}
 
 	return msg, nil
+}
+
+func UpdateMessageStatus(messageId string, status models.MessageStatus) error {
+	msgCollection := database.GetMsgsCollection()
+
+	ctx, cancel := helpers.CreateContext()
+	defer cancel()
+
+	filter := bson.M{
+		models.MessageFieldStatus: status,
+	}
+
+	var updateObj primitive.D
+	updateObj = append(updateObj, bson.E{Key: models.MessageFieldStatus, Value: status})
+
+	upsert := true
+	opt := options.UpdateOptions{
+		Upsert: &upsert,
+	}
+
+	_, err := msgCollection.UpdateOne(ctx, filter, updateObj, &opt)
+	if err != nil {
+		log.Printf("error while updating the message status: %v", err)
+		return fmt.Errorf("unable to update the message status")
+	}
+
+	return nil
 }

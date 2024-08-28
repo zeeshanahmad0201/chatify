@@ -8,6 +8,7 @@ var (
 	MessageFieldReceiverID = "receiverId"
 	MessageFieldMessage    = "message"
 	MessageFieldTimestamp  = "timestamp"
+	MessageFieldStatus     = "status"
 )
 
 var MessageValidationErrs = map[string]string{
@@ -25,10 +26,10 @@ type Message struct {
 	Status     MessageStatus      `json:"status" bson:"status"`
 }
 
-type MessageStatus string
+type MessageStatus int
 
 const (
-	Sent      MessageStatus = "sent"
-	Delivered MessageStatus = "delivered"
-	Read      MessageStatus = "read"
+	Sent MessageStatus = iota
+	Delivered
+	Read
 )
