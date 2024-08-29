@@ -127,7 +127,6 @@ func MessageWebsocket(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// TODO: complete the websocket
 		log.Printf("Message received: %v", message)
 
 		err = con.WriteMessage(websocket.TextMessage, message)
