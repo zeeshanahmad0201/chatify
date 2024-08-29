@@ -68,35 +68,35 @@ The API layer is responsible for handling incoming HTTP requests and delegating 
 
 The service layer contains the core business logic of the application. It is responsible for processing requests, interacting with the data layer, and ensuring that the business rules are followed.
 
-	-	**AuthService**: Manages user authentication, including login, signup, and token validation.
-	-	**MessageService**: Handles the creation, deletion, and updating of messages, including status tracking (sent, delivered, read).
-	-	**UserService**: Manages user-related operations, such as fetching user details.
+- **AuthService**: Manages user authentication, including login, signup, and token validation.
+- **MessageService**: Handles the creation, deletion, and updating of messages, including status tracking (sent, delivered, read).
+- **UserService**: Manages user-related operations, such as fetching user details.
 
 ## Data Layer
 
 The data layer abstracts the database interactions, making it easier to swap out the underlying database technology if needed. It uses MongoDB as the primary database for storing users and messages.
 
-	-	**MongoDB**: Stores user data and chat messages. Collections are designed to optimize read and write operations for real-time messaging.
+- **MongoDB**: Stores user data and chat messages. Collections are designed to optimize read and write operations for real-time messaging.
 
 ## WebSocket Layer
 
 The WebSocket layer enables real-time communication between the server and clients. It allows for instant message delivery and status updates without requiring constant HTTP requests.
 
-	-	**Gorilla WebSocket**: The WebSocket library used for managing real-time connections, enabling features like message broadcasting and user presence.
+- **Gorilla WebSocket**: The WebSocket library used for managing real-time connections, enabling features like message broadcasting and user presence.
 
 ## Data Flow
 
-	1. **User Authentication:**
-	-	A user submits their credentials via the /login or /signup endpoint.
-	-	The request is handled by AuthController, which calls AuthService to validate the user and generate a JWT.
-	-	The JWT is sent back to the client for use in subsequent requests.
-	2.	**Message Sending:**
-	-	A user sends a message via the /message/send endpoint.
-	-	The MessageController processes the request, and MessageService stores the message in the MongoDB collection.
-	-	If the recipient is online, the message is pushed via WebSocket; otherwise, it is marked for delivery.
-	3.	**Message Status Update:**
-	-	When a message is read or delivered, the client sends a request to /message/status/read or /message/status/delivered.
-	-	The MessageController updates the message status via MessageService, which persists the change in MongoDB.
+- **User Authentication:**
+ - A user submits their credentials via the /login or /signup endpoint.
+ - The request is handled by AuthController, which calls AuthService to validate the user and generate a JWT.
+ -	The JWT is sent back to the client for use in subsequent requests.
+- **Message Sending:**
+ - A user sends a message via the /message/send endpoint.
+ - The MessageController processes the request, and MessageService stores the message in the MongoDB collection.
+ - If the recipient is online, the message is pushed via WebSocket; otherwise, it is marked for delivery.
+- **Message Status Update:**
+ - When a message is read or delivered, the client sends a request to /message/status/read or /message/status/delivered.
+ - The MessageController updates the message status via MessageService, which persists the change in MongoDB.
 
 ### Future Enhancements
 
