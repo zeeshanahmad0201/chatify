@@ -91,12 +91,12 @@ The WebSocket layer enables real-time communication between the server and clien
    - The request is handled by AuthController, which calls AuthService to validate the user and generate a JWT.
    - The JWT is sent back to the client for use in subsequent requests.
 - **Message Sending:**
- - A user sends a message via the /message/send endpoint.
- - The MessageController processes the request, and MessageService stores the message in the MongoDB collection.
- - If the recipient is online, the message is pushed via WebSocket; otherwise, it is marked for delivery.
+   - A user sends a message via the /message/send endpoint.
+   - The MessageController processes the request, and MessageService stores the message in the MongoDB collection.
+   - If the recipient is online, the message is pushed via WebSocket; otherwise, it is marked for delivery.
 - **Message Status Update:**
- - When a message is read or delivered, the client sends a request to /message/status/read or /message/status/delivered.
- - The MessageController updates the message status via MessageService, which persists the change in MongoDB.
+   - When a message is read or delivered, the client sends a request to /message/status/read or /message/status/delivered.
+   - The MessageController updates the message status via MessageService, which persists the change in MongoDB.
 
 ### Future Enhancements
 
