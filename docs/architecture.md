@@ -87,9 +87,9 @@ The WebSocket layer enables real-time communication between the server and clien
 ## Data Flow
 
 - **User Authentication:**
-  - - A user submits their credentials via the /login or /signup endpoint.
- - The request is handled by AuthController, which calls AuthService to validate the user and generate a JWT.
-  - - The JWT is sent back to the client for use in subsequent requests.
+   - A user submits their credentials via the /login or /signup endpoint.
+   - The request is handled by AuthController, which calls AuthService to validate the user and generate a JWT.
+   - The JWT is sent back to the client for use in subsequent requests.
 - **Message Sending:**
  - A user sends a message via the /message/send endpoint.
  - The MessageController processes the request, and MessageService stores the message in the MongoDB collection.
