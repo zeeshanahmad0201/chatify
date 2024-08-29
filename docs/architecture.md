@@ -62,7 +62,7 @@ The architecture of Chatify follows a layered approach, separating the applicati
 
 The API layer is responsible for handling incoming HTTP requests and delegating them to the appropriate controllers. The controllers map the API routes to service methods that contain the business logic.
 
-	-	**Controllers**: Each controller corresponds to a specific domain (e.g., AuthController, MessageController) and contains methods for handling related API endpoints.
+- **Controllers**: Each controller corresponds to a specific domain (e.g., AuthController, MessageController) and contains methods for handling related API endpoints.
 
 ## Service Layer
 
