@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -204,7 +203,7 @@ func updateStatus(w http.ResponseWriter, r *http.Request, newStatus models.Messa
 	}
 
 	// extract the message id
-	msgId := mux.Vars(r)["messageId"]
+	msgId := r.URL.Query().Get("messageId")
 	if msgId == "" {
 		http.Error(w, "message id is missing from the route", http.StatusBadRequest)
 		return
@@ -216,8 +215,17 @@ func updateStatus(w http.ResponseWriter, r *http.Request, newStatus models.Messa
 		return
 	}
 
-	if msg.Status == newStatus {
-		http.Error(w, fmt.Sprintf("message already %v", newStatus), http.StatusBadRequest)
+	if newStatus <= msg.Status {
+		var statusMessage string
+		switch msg.Status {
+		case models.Sent:
+			statusMessage = "message already sent"
+		case models.Delivered:
+			statusMessage = "message already delivered"
+		case models.Read:
+			statusMessage = "message already read"
+		}
+		http.Error(w, statusMessage, http.StatusBadRequest)
 		return
 	}
 

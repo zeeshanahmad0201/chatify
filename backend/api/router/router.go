@@ -17,8 +17,8 @@ func InitRouter() *mux.Router {
 	// Message actions
 	r.HandleFunc("/message/send", controllers.StoreMessage).Methods("POST")
 	r.HandleFunc("/message/delete/{messageId}", controllers.DeleteMessage).Methods("DELETE")
-	r.HandleFunc("/message/status/{messageId}/read", controllers.MarkAsRead).Methods("PUT")
-	r.HandleFunc("/message/status/{messageId}/delivered", controllers.MarkAsRead).Methods("PUT")
+	r.HandleFunc("/message/status/read", controllers.MarkAsRead).Methods("PUT")
+	r.HandleFunc("/message/status/delivered", controllers.MarkAsDelivered).Methods("PUT")
 
 	// web socket
 	r.HandleFunc("/messages/listen", controllers.MessageWebsocket)
