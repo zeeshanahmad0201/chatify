@@ -13,7 +13,7 @@ The architecture of Chatify follows a layered approach, separating the applicati
 3. **Data Layer**: Responsible for database operations, abstracting MongoDB interactions.
 4. **WebSocket Layer**: Manages real-time communication between clients and the server.
 
-### Component Diagram
+## Component Diagram
 
 ```plaintext
 ┌────────────────────┐
@@ -56,15 +56,15 @@ The architecture of Chatify follows a layered approach, separating the applicati
 └───────────────────────────────┘
 ```
 
-### Detailed Architecture
+## Detailed Architecture
 
-## API Layer
+### API Layer
 
 The API layer is responsible for handling incoming HTTP requests and delegating them to the appropriate controllers. The controllers map the API routes to service methods that contain the business logic.
 
 - **Controllers**: Each controller corresponds to a specific domain (e.g., AuthController, MessageController) and contains methods for handling related API endpoints.
 
-## Service Layer
+### Service Layer
 
 The service layer contains the core business logic of the application. It is responsible for processing requests, interacting with the data layer, and ensuring that the business rules are followed.
 
@@ -72,19 +72,19 @@ The service layer contains the core business logic of the application. It is res
 - **MessageService**: Handles the creation, deletion, and updating of messages, including status tracking (sent, delivered, read).
 - **UserService**: Manages user-related operations, such as fetching user details.
 
-## Data Layer
+### Data Layer
 
 The data layer abstracts the database interactions, making it easier to swap out the underlying database technology if needed. It uses MongoDB as the primary database for storing users and messages.
 
 - **MongoDB**: Stores user data and chat messages. Collections are designed to optimize read and write operations for real-time messaging.
 
-## WebSocket Layer
+### WebSocket Layer
 
 The WebSocket layer enables real-time communication between the server and clients. It allows for instant message delivery and status updates without requiring constant HTTP requests.
 
 - **Gorilla WebSocket**: The WebSocket library used for managing real-time connections, enabling features like message broadcasting and user presence.
 
-## Data Flow
+### Data Flow
 
 - **User Authentication:**
    - A user submits their credentials via the `/login` or `/signup` endpoint.
@@ -99,20 +99,20 @@ The WebSocket layer enables real-time communication between the server and clien
    - The `MessageController` updates the message status via `MessageService`, which persists the change in MongoDB.
 
 
-### Future Enhancements
+## Future Enhancements
 
-## Microservices Architecture
+### Microservices Architecture
 
 As the application scales, the monolithic structure can be refactored into microservices. This will allow individual components to scale independently, improving performance and reliability.
 
-## End-to-End Encryption
+### End-to-End Encryption
 
 Implementing end-to-end encryption for messages would enhance the security of user data, making Chatify suitable for more sensitive communications.
 
-## Caching Layer
+### Caching Layer
 
 Adding a caching layer (e.g., Redis) can improve the performance of frequently accessed data, such as user sessions or recent messages.
 
-### Conclusion
+## Conclusion
 
 Chatify’s architecture is designed to be scalable and maintainable, making it a solid foundation for building a robust chat application. By following best practices in API design, service separation, and real-time communication, it offers a reliable platform for future growth and enhancements.
