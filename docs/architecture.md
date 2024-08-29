@@ -101,15 +101,15 @@ The WebSocket layer enables real-time communication between the server and clien
 
 ### Future Enhancements
 
-# Microservices Architecture
+## Microservices Architecture
 
 As the application scales, the monolithic structure can be refactored into microservices. This will allow individual components to scale independently, improving performance and reliability.
 
- - **End-to-End Encryption**
+## End-to-End Encryption
 
 Implementing end-to-end encryption for messages would enhance the security of user data, making Chatify suitable for more sensitive communications.
 
-- **Caching Layer**
+## Caching Layer
 
 Adding a caching layer (e.g., Redis) can improve the performance of frequently accessed data, such as user sessions or recent messages.
 
